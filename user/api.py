@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from . models import *
-from .pydantic_model import Person
+from .pydantic_model import Person,User_update,User_delete
 
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
@@ -41,5 +41,17 @@ async def all_user():
     return user_obj
 
 
+@app.put('/update')
+async def update_user(data:User_update):
+    user = await User.get(id=data.id)
+    if not user:
+        return {"status":False, "message":"User not found"}
+    else:
+        user_obj = await User.filter(id=data.id).update(name = data.name,email = data.email, phone = data.phone)
+        return user_obj
 
+@app.delete('/delete')
+async def delete_user(data:User_delete):
+    user = await User.filter(id=data.id).delete()
+    return {"status":True, "message":"User deleted successfully"}
 
